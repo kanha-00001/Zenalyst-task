@@ -1,35 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const CustomerTable = ({ quarterlyData, revenueBridgeData }) => {
-  const combinedData = quarterlyData.map(qd => {
-    const bridge = revenueBridgeData.find(rd => rd.CustomerName === qd.CustomerName) || {};
-    return { ...qd, ...bridge };
+  const [sortOption, setSortOption] = useState('none');
+
+  // Combine data if both are provided, prioritizing quarterlyData
+  const tableData = quarterlyData.length > 0 ? quarterlyData : revenueBridgeData;
+
+  // Sort function
+  const sortedData = [...tableData].sort((a, b) => {
+    if (sortOption === 'none') return 0;
+    if (sortOption === 'customerName') return (a.CustomerName || '').localeCompare(b.CustomerName || '');
+    if (sortOption === 'q3Revenue') return (a.Quarter3Revenue || 0) - (b.Quarter3Revenue || 0);
+    if (sortOption === 'q4Revenue') return (a.Quarter4Revenue || 0) - (b.Quarter4Revenue || 0);
+    return 0;
   });
 
+  if (!tableData || tableData.length === 0) {
+    return <div className="p-4 bg-gray-100 rounded shadow text-center">No customer data available.</div>;
+  }
+
   return (
-    <div className="overflow-x-auto mt-4">
-      <table className="min-w-full bg-white border border-gray-200">
+    <div className="bg-white p-4 rounded shadow mt-6">
+      <div className="mb-4 flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Customer Table</h2>
+        <select
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+          className="p-2 border rounded"
+        >
+          <option value="none">Sort By</option>
+          <option value="customerName">Customer Name</option>
+          <option value="q3Revenue">Q3 Revenue</option>
+          <option value="q4Revenue">Q4 Revenue</option>
+        </select>
+      </div>
+      <table className="w-full border-collapse">
         <thead>
-          <tr className="bg-gray-100">
-            <th className="py-2 px-4 border-b">Customer Name</th>
-            <th className="py-2 px-4 border-b">Q3 Revenue</th>
-            <th className="py-2 px-4 border-b">Q4 Revenue</th>
-            <th className="py-2 px-4 border-b">Variance</th>
-            <th className="py-2 px-4 border-b">Percentage Variance</th>
-            <th className="py-2 px-4 border-b">Churned Revenue</th>
-            <th className="py-2 px-4 border-b">Expansion Revenue</th>
+          <tr className="bg-gray-200">
+            <th className="border p-2">Customer Name</th>
+            <th className="border p-2">Q3 Revenue ($M)</th>
+            <th className="border p-2">Q4 Revenue ($M)</th>
           </tr>
         </thead>
         <tbody>
-          {combinedData.map((item, index) => (
-            <tr key={index} className="hover:bg-gray-50">
-              <td className="py-2 px-4 border-b">{item.CustomerName}</td>
-              <td className="py-2 px-4 border-b">{item.Quarter3Revenue?.toLocaleString() || 'N/A'}</td>
-              <td className="py-2 px-4 border-b">{item.Quarter4Revenue?.toLocaleString() || 'N/A'}</td>
-              <td className="py-2 px-4 border-b">{item.Variance?.toLocaleString() || 'N/A'}</td>
-              <td className="py-2 px-4 border-b">{item.PercentageOfVariance?.toFixed(2) || 'N/A'}%</td>
-              <td className="py-2 px-4 border-b">{item.ChurnedRevenue?.toLocaleString() || 'N/A'}</td>
-              <td className="py-2 px-4 border-b">{item.ExpansionRevenue?.toLocaleString() || 'N/A'}</td>
+          {sortedData.map((item, index) => (
+            <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}>
+              <td className="border p-2">{item.CustomerName || 'N/A'}</td>
+              <td className="border p-2">{(item.Quarter3Revenue || 0).toFixed(2)}</td>
+              <td className="border p-2">{(item.Quarter4Revenue || 0).toFixed(2)}</td>
             </tr>
           ))}
         </tbody>

@@ -1,12 +1,53 @@
-# React + Vite
+# 📊 Revenue Intelligence Dashboard - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend component of the Revenue Intelligence Dashboard, built using React. It provides an interactive user interface to visualize and analyze revenue-related data through charts and tables.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Technologies Used
 
-## Expanding the ESLint configuration
+- **React** – Frontend UI framework.
+- **Vite** – Lightning-fast dev server and build tool.
+- **Axios** – HTTP client for API communication.
+- **React-ChartJS-2 & Chart.js** – For rendering interactive bar and pie charts.
+- **Tailwind CSS** – Utility-first CSS framework for responsive styling.
+- **React Router** *(optional for extension)* – Enables routing if needed in future versions.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## ✅ Functionalities Implemented
+
+- 📤 **Data Upload**
+  - Upload JSON files for:
+    - `quarterly`
+    - `countries`
+    - `regions`
+    - `revenue-bridge`
+    - `customer-concentration`
+
+- 📈 **Revenue Insights**
+  - Bar Chart: Top 10 countries by revenue.
+  - Bar Chart: Top 10 customers with highest Q3–Q4 revenue growth.
+  - Pie Chart: Country-wise revenue distribution.
+
+- 📋 **Customer Table**
+  - Displays customer data with:
+    - Search/filtering by name, region, and country.
+    - Sortable columns: Customer Name, Q3, Q4, Growth %, Country, Region.
+
+- 🔢 **Summary Card**
+  - Displays aggregated financial metrics (e.g., total Q3, Q4, revenue growth).
+
+- 📊 **Revenue Chart**
+  - Line/bar chart showing trends for selected metrics.
+
+- ❗ **Error Handling**
+  - Clear messages for invalid file uploads or failed API calls.
+
+- 📱 **Responsive Design**
+  - Fully responsive layout using Tailwind CSS, optimized for desktop and mobile.
+
+---
+
+## 📁 Project Structure
+
