@@ -1,24 +1,90 @@
-# Logs
-logs
+# --- Node.js ---
+node_modules/
+dist/
+build/
+.npm/
+.env
+.env.*.local
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+.pnp.*
+.pnp
 
-node_modules
-dist
-dist-ssr
-*.local
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.so
+*.egg-info/
+.eggs/
+*.egg
+*.manifest
+*.spec
+*.pot
+*.mo
+*.log
+*.db
+*.sqlite
+*.sqlite3
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# Virtual environments
+venv/
+env/
+.venv/
+.ENV/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment files
+.env
+
+
+# Coverage and test
+.coverage
+coverage.*
+.cache/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+hypothesis/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# pyright
+pyrightconfig.json
+
+# --- General OS and editor files ---
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# --- Frontend build tools ---
+.cache/
+.next/
+.svelte-kit/
+storybook-static/
+.eslintcache
+tsconfig.tsbuildinfo
+
+# Swagger/OpenAPI
+swagger.json
+swagger.yaml
