@@ -35,4 +35,13 @@ router.post('/', async (req, res) => {
   }
 });
 
+
+router.delete('/clear', async (req, res) => {
+  try {
+    await QuarterlyRevenue.deleteMany({});
+    res.json({ message: 'Quarterly revenue data cleared successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to clear quarterly data', message: err.message });
+  }
+});
 module.exports = router;

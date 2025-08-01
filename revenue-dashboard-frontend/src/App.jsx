@@ -181,7 +181,17 @@ const App = () => {
     }
   };
 
-  const handleClearData = () => {
+ const handleClearData = async () => {
+  try {
+    setLoading(true);
+    await Promise.all([
+      axios.delete('http://localhost:5000/api/v1/quarterly/clear'),
+      axios.delete('http://localhost:5000/api/v1/revenue-bridge/clear'),
+      axios.delete('http://localhost:5000/api/v1/countries/clear'),
+      axios.delete('http://localhost:5000/api/v1/regions/clear'),
+      axios.delete('http://localhost:5000/api/v1/customer-concentration/clear')
+    ]);
+
     setQuarterlyData([]);
     setRevenueBridgeData([]);
     setCountryData([]);
@@ -191,7 +201,13 @@ const App = () => {
     setFileType('');
     setPreviewData(null);
     setError(null);
-  };
+  } catch (err) {
+    setError('Failed to clear data: ' + err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   if (loading) return <div className="text-center py-8 text-lg">Loading...</div>;
   if (error) return <div className="text-center py-4 text-red-600">{error}</div>;
