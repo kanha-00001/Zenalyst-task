@@ -3,7 +3,7 @@ import axios from 'axios';
 import CustomerTable from './components/CustomerTable.jsx';
 import RevenueChart from './components/RevenueChart.jsx';
 import SummaryCard from './components/SummaryCard.jsx';
-import TopInsights from './components/TopInsights.jsx'; // ✅ NEW component
+import TopInsights from './components/TopInsights.jsx';
 
 const App = () => {
   const [quarterlyData, setQuarterlyData] = useState([]);
@@ -17,6 +17,14 @@ const App = () => {
   const [file, setFile] = useState(null);
   const [fileType, setFileType] = useState('');
   const [previewData, setPreviewData] = useState(null);
+
+  const requiredFields = {
+    quarterly: ['CustomerName', 'Quarter3Revenue', 'Quarter4Revenue', 'Variance', 'PercentageOfVariance'],
+    'revenue-bridge': ['CustomerName', 'Quarter3Revenue', 'Quarter4Revenue', 'ChurnedRevenue', 'NewRevenue', 'ExpansionRevenue', 'ContractionRevenue'],
+    countries: ['Country', 'YearlyRevenue'],
+    regions: ['Region', 'YearlyRevenue'],
+    'customer-concentration': ['CustomerName', 'TotalRevenue'],
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -127,34 +135,34 @@ const App = () => {
         },
       };
 
-      const firstItem = jsonData[0];
-      console.log('Parsed JSON:', jsonData);
-      console.log('First item (raw):', firstItem);
       if (!jsonData.length) {
         throw new Error('JSON array is empty');
-      }
-
-      const normalizedFirstItem = {};
-      for (const key in firstItem) {
-        const normalizedKey = Object.keys(fieldMappings[fileType]).find(mapKey => mapKey.toLowerCase() === key.toLowerCase());
-        normalizedFirstItem[fieldMappings[fileType][normalizedKey] || key] = firstItem[key];
-      }
-      console.log('First item (normalized):', normalizedFirstItem);
-
-      const expectedFields = requiredFields[fileType];
-      const hasAllFields = expectedFields.every(field => field in normalizedFirstItem);
-      if (!hasAllFields) {
-        throw new Error(`JSON file missing required fields for ${fileType} after normalization`);
       }
 
       const normalizedJsonData = jsonData.map(item => {
         const normalizedItem = {};
         for (const key in item) {
-          const match = Object.keys(fieldMappings[fileType]).find(k => k.toLowerCase() === key.toLowerCase());
-          normalizedItem[fieldMappings[fileType][match] || key] = item[key];
+          const matches = Object.keys(fieldMappings[fileType]).filter(k => k.toLowerCase() === key.toLowerCase());
+          if (matches.length > 1) {
+            throw new Error(`Ambiguous field name: ${key} matches multiple mappings`);
+          }
+          const match = matches[0];
+          if (match) {
+            normalizedItem[fieldMappings[fileType][match]] = item[key];
+          }
         }
         return normalizedItem;
       });
+
+      const firstItem = normalizedJsonData[0];
+      console.log('Parsed JSON:', jsonData);
+      console.log('First item (normalized):', firstItem);
+
+      const expectedFields = requiredFields[fileType];
+      const hasAllFields = expectedFields.every(field => field in firstItem);
+      if (!hasAllFields) {
+        throw new Error(`JSON file missing required fields for ${fileType}: ${expectedFields.join(', ')}`);
+      }
 
       const response = await axios.post(`http://localhost:5000${endpointMap[fileType]}`, normalizedJsonData, {
         headers: { 'Content-Type': 'application/json' }
@@ -172,7 +180,8 @@ const App = () => {
 
       setError(null);
     } catch (err) {
-      setError('Failed to upload file: ' + err.message);
+      const errorMessage = err.response?.data?.message || err.message || 'Unknown error';
+      setError('Failed to upload file: ' + errorMessage);
     } finally {
       setLoading(false);
       setFile(null);
@@ -181,33 +190,32 @@ const App = () => {
     }
   };
 
- const handleClearData = async () => {
-  try {
-    setLoading(true);
-    await Promise.all([
-      axios.delete('http://localhost:5000/api/v1/quarterly/clear'),
-      axios.delete('http://localhost:5000/api/v1/revenue-bridge/clear'),
-      axios.delete('http://localhost:5000/api/v1/countries/clear'),
-      axios.delete('http://localhost:5000/api/v1/regions/clear'),
-      axios.delete('http://localhost:5000/api/v1/customer-concentration/clear')
-    ]);
+  const handleClearData = async () => {
+    try {
+      setLoading(true);
+      await Promise.all([
+        axios.delete('http://localhost:5000/api/v1/quarterly/clear'),
+        axios.delete('http://localhost:5000/api/v1/revenue-bridge/clear'),
+        axios.delete('http://localhost:5000/api/v1/countries/clear'),
+        axios.delete('http://localhost:5000/api/v1/regions/clear'),
+        axios.delete('http://localhost:5000/api/v1/customer-concentration/clear')
+      ]);
 
-    setQuarterlyData([]);
-    setRevenueBridgeData([]);
-    setCountryData([]);
-    setRegionData([]);
-    setCustomerConcentrationData([]);
-    setFile(null);
-    setFileType('');
-    setPreviewData(null);
-    setError(null);
-  } catch (err) {
-    setError('Failed to clear data: ' + err.message);
-  } finally {
-    setLoading(false);
-  }
-};
-
+      setQuarterlyData([]);
+      setRevenueBridgeData([]);
+      setCountryData([]);
+      setRegionData([]);
+      setCustomerConcentrationData([]);
+      setFile(null);
+      setFileType('');
+      setPreviewData(null);
+      setError(null);
+    } catch (err) {
+      setError('Failed to clear data: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) return <div className="text-center py-8 text-lg">Loading...</div>;
   if (error) return <div className="text-center py-4 text-red-600">{error}</div>;
